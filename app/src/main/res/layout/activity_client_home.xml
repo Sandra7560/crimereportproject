@@ -1,23 +1,30 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:gravity="center"
-    android:background="@color/white"
+    android:orientation="horizontal"
+
+    android:background="@color/dark_red"
     android:padding="16dp">
 
     <TextView
         android:id="@+id/welcomeTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Welcome!"
+
         android:textSize="18sp"
         android:textColor="@android:color/black"
         android:layout_centerInParent="true"/>
 
     <Button
+        android:id="@+id/reportButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Report Crime"
+        android:layout_marginTop="16dp" />
+    <Button
+        android:id="@+id/profileButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Profile"
         android:layout_marginTop="16dp" />
 </LinearLayout>

@@ -1,6 +1,8 @@
 package com.example.crime;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
@@ -22,11 +24,16 @@ public class clientHome extends AppCompatActivity {
 
         // Retrieve the user information
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        if (user != null) {
-            String username = user.getDisplayName(); // You can also retrieve other details like email or uid
-            welcomeTextView.setText("Welcome!");
-        } else {
-            welcomeTextView.setText("Welcome, Guest!");
-        }
+//        if (user != null) {
+//            String username = user.getDisplayName(); // You can also retrieve other details like email or uid
+//            welcomeTextView.setText("Welcome!");
+//        } else {
+//            welcomeTextView.setText("Welcome, Guest!");
+//        }
+        Button viewProfileButton = findViewById(R.id.profileButton);
+        viewProfileButton.setOnClickListener(v -> {
+            Intent intent = new Intent(clientHome.this, Profile.class);
+            startActivity(intent);
+        });
     }
 }
