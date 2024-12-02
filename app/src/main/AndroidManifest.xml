@@ -13,6 +13,9 @@
         android:theme="@style/Theme.Crime"
         tools:targetApi="31">
         <activity
+            android:name=".forgotPassword"
+            android:exported="false" />
+        <activity
             android:name=".Splashscreen"
             android:exported="true">
             <intent-filter>
@@ -20,15 +23,13 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
         </activity>
         <activity
             android:name=".registerActivity"
             android:exported="false" />
         <activity
             android:name=".signinActivity"
-            android:exported="false"/>
-
+            android:exported="false" />
         <activity
             android:name=".MainActivity"
             android:exported="false" />

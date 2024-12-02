@@ -1,5 +1,6 @@
 package com.example.crime;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 
 import androidx.activity.EdgeToEdge;
@@ -32,6 +33,12 @@ public class signinActivity extends AppCompatActivity {
         EditText passwordField = findViewById(R.id.passwordFieldSignIn);
         Button signInButton = findViewById(R.id.signInButton);
         TextView registerLink = findViewById(R.id.registerLink);
+        @SuppressLint({"MissingInflatedId", "LocalSuppress"}) TextView forgotPasswordLink = findViewById(R.id.forgotPasswordLink);
+
+        forgotPasswordLink.setOnClickListener(v -> {
+            Intent intent = new Intent(signinActivity.this, forgotPassword.class);
+            startActivity(intent);
+        });
 
         signInButton.setOnClickListener(v -> {
             String email = emailField.getText().toString().trim();
