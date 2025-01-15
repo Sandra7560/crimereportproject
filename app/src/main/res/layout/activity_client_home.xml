@@ -1,30 +1,97 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="horizontal"
-
     android:background="@color/dark_red"
     android:padding="16dp">
 
+    <!-- User Profile Icon -->
+    <ImageView
+        android:id="@+id/userProfileIcon"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:src="@drawable/ic_user_photo"
+        android:contentDescription="User Profile"
+        android:background="@drawable/circular_background_3_3"
+        android:padding="4dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- Welcome Text -->
     <TextView
         android:id="@+id/welcomeTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:text="Welcome to CrimeConnect"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:textColor="@android:color/white"
+        app:layout_constraintTop_toBottomOf="@+id/userProfileIcon"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="16dp" />
 
-        android:textSize="18sp"
-        android:textColor="@android:color/black"
-        android:layout_centerInParent="true"/>
+    <!-- App Description Text -->
+    <TextView
+        android:id="@+id/appDescriptionTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="CrimeConnect is an app to report crimes and alert authorities. Stay safe and help others."
+        android:textSize="16sp"
+        android:textColor="@android:color/white"
+        app:layout_constraintTop_toBottomOf="@+id/welcomeTextView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="16dp" />
+    <Button
+        android:id="@+id/myCrimeReportsButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="My Active Crime Reports"
+        android:layout_margin="16dp"
+        android:background="@color/colorAccent"
+        android:textColor="@android:color/white"
+        tools:ignore="MissingConstraints" />
 
+    <!-- Report Crime Button -->
     <Button
         android:id="@+id/reportButton"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="Report Crime"
-        android:layout_marginTop="16dp" />
+        android:padding="12dp"
+        android:textStyle="bold"
+        android:textColor="@android:color/white"
+        android:background="@color/colorAccent"
+        app:layout_constraintTop_toBottomOf="@+id/appDescriptionTextView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="24dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp" />
+
+
+    <!-- Emergency SOS Button -->
     <Button
-        android:id="@+id/profileButton"
+        android:id="@+id/emergencySOSButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Profile"
-        android:layout_marginTop="16dp" />
-</LinearLayout>
+        android:text="SOS"
+        android:textStyle="bold"
+        android:textColor="@android:color/white"
+        android:backgroundTint="@color/black"
+        android:padding="24dp"
+        android:layout_margin="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginBottom="24dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_gravity="center_horizontal"
+        />
+</androidx.constraintlayout.widget.ConstraintLayout>

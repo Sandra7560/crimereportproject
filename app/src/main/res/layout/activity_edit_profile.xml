@@ -21,12 +21,7 @@
             android:contentDescription="Profile Image"
             />
 
-        <Button
-            android:id="@+id/uploadPhotoButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Upload Photo"
-            android:layout_marginBottom="24dp" />
+
 
         <!-- Name -->
         <EditText
@@ -56,13 +51,28 @@
 
         <!-- SIN Number -->
         <EditText
-            android:id="@+id/editSIN"
+            android:id="@+id/editCellNumber"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="SIN Number"
-            android:inputType="number"
-            android:layout_marginBottom="12dp" />
+            android:hint="Cell Number"
+            android:inputType="phone"
+            android:textColor="@android:color/black"
+            android:textStyle="bold"
+            android:layout_marginTop="16dp" />
 
+        <EditText
+            android:id="@+id/editEmergencyContact"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Emergency contact"
+            android:inputType="phone"/>
+
+        <EditText
+            android:id="@+id/editEmergencyEmail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Emergency Contact Email"
+            android:inputType="textEmailAddress"/>
         <!-- Update Button -->
         <Button
             android:id="@+id/updateButton"

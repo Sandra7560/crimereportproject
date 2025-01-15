@@ -2,21 +2,54 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:gravity="center"
-    android:background="@color/white"
+    android:background="@color/dark_red"
     android:padding="16dp">
 
-    <TextView
-        android:layout_width="wrap_content"
+    <!-- Top Section for Welcome message and Buttons -->
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Welcome, Admin!"
-        android:textSize="24sp"
-        android:textColor="@color/dark_red"
-        android:textStyle="bold" />
+        android:orientation="vertical"
+        android:background="@drawable/rounded_background"
+        android:layout_marginBottom="16dp"
+        android:padding="16dp">
 
+        <!-- Welcome message -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Welcome, Admin!"
+            android:textSize="24sp"
+            android:textColor="@color/black"
+            android:textStyle="bold"
+            android:layout_marginBottom="16dp" />
+
+        <!-- Buttons arranged vertically with margins -->
+        <Button
+            android:id="@+id/viewReportsButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="View Reports"
+            android:textSize="16sp"
+            android:layout_marginBottom="12dp"/>
+
+        <Button
+            android:id="@+id/postCrimeNewsButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:text="Post New Crime News"
+            android:textSize="16sp" />
+
+    </LinearLayout>
+
+    <!-- Logout Button -->
     <Button
-        android:layout_width="wrap_content"
+        android:id="@+id/logoutButton"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="View Reports"
-        android:layout_marginTop="16dp" />
+        android:layout_marginBottom="12dp"
+        android:text="Logout"
+        android:textSize="16sp" />
+
 </LinearLayout>

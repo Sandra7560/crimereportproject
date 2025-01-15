@@ -2,19 +2,12 @@ package com.example.crime;
 
 import android.os.Bundle;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
+
 import android.content.Intent;
-import android.os.Bundle;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
-
-import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -24,12 +17,11 @@ import com.google.firebase.database.FirebaseDatabase;
 
 public class Profile extends AppCompatActivity {
 
-
     private FirebaseAuth mAuth;
     private DatabaseReference databaseReference;
 
     private ImageView profileImageView;
-    private TextView profileName, profileEmail, profileAddress, profileSIN;
+    private TextView profileName, profileEmail, profileAddress, profileCell;
     private Button editProfileButton;
 
     @Override
@@ -47,7 +39,7 @@ public class Profile extends AppCompatActivity {
         profileName = findViewById(R.id.profileName);
         profileEmail = findViewById(R.id.profileEmail);
         profileAddress = findViewById(R.id.profileAddress);
-        profileSIN = findViewById(R.id.profileSIN);
+        profileCell = findViewById(R.id.profileCell); // Replacing SIN with Cell Number
         editProfileButton = findViewById(R.id.editProfileButton);
 
         // Populate the user profile
@@ -60,10 +52,10 @@ public class Profile extends AppCompatActivity {
                 if (task.isSuccessful() && task.getResult() != null) {
                     DataSnapshot snapshot = task.getResult();
                     String address = snapshot.child("address").getValue(String.class);
-                    String sin = snapshot.child("sin").getValue(String.class);
+                    String cellNumber = snapshot.child("cell").getValue(String.class); // Updated to fetch cell number
 
                     profileAddress.setText("Address: " + (address != null ? address : "N/A"));
-                    profileSIN.setText("SIN: " + (sin != null ? sin : "N/A"));
+                    profileCell.setText("Cell Number: " + (cellNumber != null ? cellNumber : "N/A")); // Display cell number
                 }
             });
         }
@@ -74,7 +66,8 @@ public class Profile extends AppCompatActivity {
             startActivity(intent);
         });
 
+        // Back Button
         Button backButton = findViewById(R.id.backButton);
         backButton.setOnClickListener(v -> onBackPressed()); // Go back to the previous activity
     }
-    }
+}

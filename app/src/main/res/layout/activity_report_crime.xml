@@ -1,0 +1,95 @@
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="20dp"
+    android:background="@android:color/holo_red_dark"> <!-- Set background color to red -->
+
+    <!-- Title -->
+    <TextView
+        android:id="@+id/postCrimeTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Post Crime Report"
+        android:textSize="24sp"
+        android:textColor="@color/colorPrimary"
+        android:textStyle="bold"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginBottom="32dp" /> <!-- Increased space from top -->
+
+    <!-- Dropdown for Crime Type -->
+    <!-- Increased space between dropdown and description -->
+
+    <!-- Description Field -->
+    <!-- Larger description field -->
+
+    <!-- Location Button -->
+    <!-- Increased space between location button and submit button -->
+
+    <!-- Submit Button -->
+
+    <AutoCompleteTextView
+        android:id="@+id/crimeTypeDropdown"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/dropdown_background"
+        android:hint="Select Crime Type"
+        android:padding="12dp"
+        android:textColor="@android:color/black"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/postCrimeTitle" />
+
+    <EditText
+        android:id="@+id/crimeDescriptionEditText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="60dp"
+        android:background="@drawable/edittext_background"
+        android:hint="Describe the Crime"
+        android:minHeight="120dp"
+        android:padding="12dp"
+        android:textColor="@android:color/black"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/crimeTypeDropdown" />
+
+    <Button
+        android:id="@+id/selectLocationButton"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="204dp"
+        android:backgroundTint="@color/colorAccent"
+        android:elevation="4dp"
+        android:text="Select Location"
+        android:textColor="@android:color/white"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/crimeDescriptionEditText" />
+
+    <Button
+        android:id="@+id/submitCrimeReportButton"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="76dp"
+        android:backgroundTint="@color/colorPrimary"
+        android:elevation="4dp"
+        android:text="Submit Crime Report"
+        android:textColor="@android:color/white"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/selectLocationButton" /> <!-- Add some space at the bottom -->
+
+</androidx.constraintlayout.widget.ConstraintLayout>

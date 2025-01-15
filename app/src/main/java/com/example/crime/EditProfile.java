@@ -4,33 +4,24 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-
-
 
 public class EditProfile extends AppCompatActivity {
 
     private FirebaseAuth mAuth;
-    private EditText editName, editEmail, editAddress, editSIN;
-    private ImageView profileImage;
-    private Button uploadPhotoButton, updateButton;
-
+    private EditText editName, editEmail, editAddress, editCellNumber, editEmergencyContact, editEmergencyEmail;
+    private Button updateButton;
     private DatabaseReference databaseReference;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_profile);
 
@@ -42,9 +33,9 @@ public class EditProfile extends AppCompatActivity {
         editName = findViewById(R.id.editName);
         editEmail = findViewById(R.id.editEmail);
         editAddress = findViewById(R.id.editAddress);
-        editSIN = findViewById(R.id.editSIN);
-        profileImage = findViewById(R.id.profileImage);
-        uploadPhotoButton = findViewById(R.id.uploadPhotoButton);
+        editCellNumber = findViewById(R.id.editCellNumber);
+        editEmergencyContact = findViewById(R.id.editEmergencyContact);
+        editEmergencyEmail = findViewById(R.id.editEmergencyEmail);
         updateButton = findViewById(R.id.updateButton);
 
         // Prefill fields with current user data if available
@@ -56,74 +47,52 @@ public class EditProfile extends AppCompatActivity {
             databaseReference.get().addOnCompleteListener(task -> {
                 if (task.isSuccessful() && task.getResult() != null) {
                     editAddress.setText(task.getResult().child("address").getValue(String.class));
-                    editSIN.setText(task.getResult().child("sin").getValue(String.class));
+                    editCellNumber.setText(task.getResult().child("cell").getValue(String.class));
+                    editEmergencyContact.setText(task.getResult().child("emergencyContact").getValue(String.class));
+                    editEmergencyEmail.setText(task.getResult().child("emergencyEmail").getValue(String.class));
                 }
             });
         }
 
-        // Photo upload functionality (placeholder)
-        uploadPhotoButton.setOnClickListener(v -> {
-            Toast.makeText(this, "Photo upload functionality coming soon!", Toast.LENGTH_SHORT).show();
-        });
+        // Update profile when button is clicked
+        updateButton.setOnClickListener(v -> updateProfile());
+    }
 
-        // Update profile
-        updateButton.setOnClickListener(v -> {
-            String newName = editName.getText().toString().trim();
-            String newEmail = editEmail.getText().toString().trim();
-            String newAddress = editAddress.getText().toString().trim();
-            String newSIN = editSIN.getText().toString().trim();
+    private void updateProfile() {
+        String newName = editName.getText().toString().trim();
+        String newEmail = editEmail.getText().toString().trim();
+        String newAddress = editAddress.getText().toString().trim();
+        String newCellNumber = editCellNumber.getText().toString().trim();
+        String newEmergencyContact = editEmergencyContact.getText().toString().trim();
+        String newEmergencyEmail = editEmergencyEmail.getText().toString().trim();
 
-            if (newName.isEmpty() || newEmail.isEmpty() || newAddress.isEmpty() || newSIN.isEmpty()) {
-                Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show();
-                return;
-            }
+        if (newName.isEmpty() || newEmail.isEmpty() || newAddress.isEmpty() || newCellNumber.isEmpty() || newEmergencyContact.isEmpty() || newEmergencyEmail.isEmpty()) {
+            Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
-            // Update name in Firebase Authentication
-            UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
-                    .setDisplayName(newName)
-                    .build();
+        FirebaseUser user = mAuth.getCurrentUser();
+        if (user == null) return;
 
-            user.updateProfile(profileUpdates)
-                    .addOnCompleteListener(task -> {
-                        if (task.isSuccessful()) {
-                            Toast.makeText(EditProfile.this, "Profile updated!", Toast.LENGTH_SHORT).show();
-                        } else {
-                            Toast.makeText(EditProfile.this, "Update failed: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
-                        }
-                    });
-
-            // Update email in Firebase Authentication
-            user.updateEmail(newEmail)
-                    .addOnCompleteListener(task -> {
-                        if (task.isSuccessful()) {
-                            Toast.makeText(EditProfile.this, "Email updated!", Toast.LENGTH_SHORT).show();
-                        } else {
-                            Toast.makeText(EditProfile.this, "Email update failed: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
-                        }
-                    });
-
-            // Save additional info to Firebase Realtime Database
-            databaseReference.child("address").setValue(newAddress);
-            databaseReference.child("sin").setValue(newSIN);
-
-            // Update Firebase Authentication user profile
-            FirebaseUser currentUser = mAuth.getCurrentUser();
-            if (currentUser != null) {
-                currentUser.updateProfile(
-                        new UserProfileChangeRequest.Builder().setDisplayName(newName).build()
-                ).addOnCompleteListener(task -> {
+        // Update email in Firebase Authentication
+        user.updateEmail(newEmail)
+                .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-                        Toast.makeText(this, "Profile updated successfully", Toast.LENGTH_SHORT).show();
-
-                        // Navigate to ProfileActivity
-                        Intent intent = new Intent(EditProfile.this, Profile.class);
-                        startActivity(intent);
-                        finish();
+                        Toast.makeText(this, "Email updated!", Toast.LENGTH_SHORT).show();
                     } else {
-                        Toast.makeText(this, "Error updating profile: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, "Email update failed: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 });
-            }
-        });
+
+        // Save additional info (including emergency contact) to Firebase Realtime Database
+        databaseReference.child("address").setValue(newAddress);
+        databaseReference.child("cell").setValue(newCellNumber);
+        databaseReference.child("emergencyContact").setValue(newEmergencyContact);
+        databaseReference.child("emergencyEmail").setValue(newEmergencyEmail);
+
+        // Navigate back to Profile Activity
+        Intent intent = new Intent(EditProfile.this, Profile.class);
+        startActivity(intent);
+        finish();
     }
 }
