@@ -12,6 +12,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -82,21 +83,31 @@ public class reportCrimeActivity extends AppCompatActivity {
 
         // Get the current user's UID or use "Anonymous" if not authenticated
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
-        String userId = mAuth.getCurrentUser() != null ? mAuth.getCurrentUser().getUid() : "Anonymous";
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        String username = currentUser != null ? currentUser.getDisplayName() : "Unknown User";
 
         // Firebase database reference
+        assert username != null;
         DatabaseReference database = FirebaseDatabase.getInstance()
                 .getReference("crime_reports")
-                .child(userId); // Group reports by user
+                .child(username); // Group reports by user
+        String uniqueId = database.push().getKey();
 
-        // Create a new CrimeReport object
+        if (uniqueId == null) {
+            Toast.makeText(this, "Error generating unique ID for the report.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Create a new CrimeReport object with an empty remarks field initially
+        String reportId = "";
         CrimeReport newReport = new CrimeReport(
+
                 crimeType,
                 description,
-                selectedLatitude,
+            selectedLatitude,
                 selectedLongitude,
-                userId,
-                "Pending"
+                username,
+                ""
         );
 
         // Disable submit button during submission
@@ -107,7 +118,7 @@ public class reportCrimeActivity extends AppCompatActivity {
         database.push().setValue(newReport)
                 .addOnSuccessListener(aVoid -> {
                     Toast.makeText(this, "Crime report submitted successfully", Toast.LENGTH_SHORT).show();
-                    finish();
+                    finish(); // Close the activity after successful submission
                 })
                 .addOnFailureListener(e -> {
                     Toast.makeText(this, "Failed to submit crime report. Please try again.", Toast.LENGTH_SHORT).show();

@@ -47,15 +47,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="16dp" />
-    <Button
-        android:id="@+id/myCrimeReportsButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="My Active Crime Reports"
-        android:layout_margin="16dp"
-        android:background="@color/colorAccent"
-        android:textColor="@android:color/white"
-        tools:ignore="MissingConstraints" />
 
     <!-- Report Crime Button -->
     <Button
@@ -74,6 +65,22 @@
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp" />
 
+    <!-- View My Report History Button (Moved Below Report Crime Button) -->
+    <Button
+        android:id="@+id/viewHistoryButton"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="View My Report History"
+        android:padding="12dp"
+        android:textStyle="bold"
+        android:textColor="@android:color/white"
+        android:background="@color/colorAccent"
+        app:layout_constraintTop_toBottomOf="@+id/reportButton"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp" />
 
     <!-- Emergency SOS Button -->
     <Button

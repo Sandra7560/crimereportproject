@@ -3,30 +3,60 @@ package com.example.crime;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import androidx.annotation.NonNull;
+
 public class CrimeReport implements Parcelable {
+
     private String crimeType;
     private String description;
-    private String status;
-    private double latitude;
-    private double longitude;
+    private String remarks;
     private String username;
+    private Double latitude;  // Keep as Double
+    private Double longitude; // Keep as Double
 
-    public CrimeReport(String crimeType, String description, String status, double latitude, double longitude, String username) {
+    // Default constructor
+    public CrimeReport() {}
+
+    // Constructor to handle latitude and longitude as String or Double
+    public CrimeReport( String crimeType, String description, Object latitude, Object longitude, String username, String remarks) {
+
         this.crimeType = crimeType;
         this.description = description;
-        this.status = status;
-        this.latitude = latitude;
-        this.longitude = longitude;
         this.username = username;
+        this.remarks = remarks;
+
+        // Handle latitude conversion to Double
+        if (latitude instanceof String) {
+            try {
+                this.latitude = Double.parseDouble((String) latitude);
+            } catch (NumberFormatException e) {
+                this.latitude = null;  // Handle invalid number format
+            }
+        } else if (latitude instanceof Double) {
+            this.latitude = (Double) latitude;
+        }
+
+        // Handle longitude conversion to Double
+        if (longitude instanceof String) {
+            try {
+                this.longitude = Double.parseDouble((String) longitude);
+            } catch (NumberFormatException e) {
+                this.longitude = null;  // Handle invalid number format
+            }
+        } else if (longitude instanceof Double) {
+            this.longitude = (Double) longitude;
+        }
     }
 
+    // Parcelable implementation
     protected CrimeReport(Parcel in) {
         crimeType = in.readString();
         description = in.readString();
-        status = in.readString();
-        latitude = in.readDouble();
-        longitude = in.readDouble();
+        remarks = in.readString();
         username = in.readString();
+        latitude = in.readDouble();  // Read Double
+        longitude = in.readDouble(); // Read Double
+
     }
 
     public static final Creator<CrimeReport> CREATOR = new Creator<CrimeReport>() {
@@ -41,17 +71,75 @@ public class CrimeReport implements Parcelable {
         }
     };
 
-    public CrimeReport(String crimeType, String description, double selectedLatitude, double selectedLongitude, String userId, String pending) {
+    // Getters and Setters
+    public String getCrimeType() {
+        return crimeType;
     }
 
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(crimeType);
-        dest.writeString(description);
-        dest.writeString(status);
-        dest.writeDouble(latitude);
-        dest.writeDouble(longitude);
-        dest.writeString(username);
+    public void setCrimeType(String crimeType) {
+        this.crimeType = crimeType;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getRemarks() {
+        return remarks;
+    }
+
+    public void setRemarks(String remarks) {
+        this.remarks = remarks;
+    }
+
+
+
+
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public Double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(Object latitude) {
+        // Handle latitude conversion to Double
+        if (latitude instanceof String) {
+            try {
+                this.latitude = Double.parseDouble((String) latitude);
+            } catch (NumberFormatException e) {
+                this.latitude = null;
+            }
+        } else if (latitude instanceof Double) {
+            this.latitude = (Double) latitude;
+        }
+    }
+
+    public Double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(Object longitude) {
+        // Handle longitude conversion to Double
+        if (longitude instanceof String) {
+            try {
+                this.longitude = Double.parseDouble((String) longitude);
+            } catch (NumberFormatException e) {
+                this.longitude = null;
+            }
+        } else if (longitude instanceof Double) {
+            this.longitude = (Double) longitude;
+        }
     }
 
     @Override
@@ -59,28 +147,17 @@ public class CrimeReport implements Parcelable {
         return 0;
     }
 
-    // Getters
-    public String getCrimeType() {
-        return crimeType;
-    }
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(crimeType);
+        dest.writeString(description);
+        dest.writeString(remarks);
+        dest.writeString(username);
+        dest.writeDouble(latitude != null ? latitude : 0.0);  // Handle null
+        dest.writeDouble(longitude != null ? longitude : 0.0); // Handle null
 
-    public String getDescription() {
-        return description;
-    }
+     }
 
-    public String getStatus() {
-        return status;
-    }
 
-    public double getLatitude() {
-        return latitude;
-    }
 
-    public double getLongitude() {
-        return longitude;
-    }
-
-    public String getUsername() {
-        return username;
-    }
 }

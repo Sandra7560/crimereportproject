@@ -22,20 +22,29 @@
         android:text="Description"
         android:textSize="14sp"/>
 
-    <!-- Crime Location -->
+    <!-- Crime Status -->
     <TextView
-        android:id="@+id/locationTextView"
+        android:id="@+id/remarksTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Location"
-        android:textSize="14sp"/>
-
-    <!-- Username -->
-    <TextView
-        android:id="@+id/usernameTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Username"
+        android:text="Remarks"
         android:textSize="14sp"
         android:textColor="@android:color/darker_gray"/>
+
+    <!-- Delete Button -->
+    <ImageButton
+        android:id="@+id/deleteButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@android:drawable/ic_delete"
+        android:contentDescription="Delete"
+        android:layout_gravity="end"/>
+
+
+
+    
+
+
 </LinearLayout>
+
+

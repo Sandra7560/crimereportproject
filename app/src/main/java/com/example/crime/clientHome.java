@@ -1,6 +1,7 @@
 package com.example.crime;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -31,8 +32,10 @@ import com.google.android.gms.location.LocationServices;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
@@ -54,15 +57,13 @@ public class clientHome extends AppCompatActivity {
         ImageView profileIcon = findViewById(R.id.userProfileIcon);
         Button emergencySOSButton = findViewById(R.id.emergencySOSButton);
         Button reportCrimeButton = findViewById(R.id.reportButton);
-        Button myCrimeReportsButton = findViewById(R.id.myCrimeReportsButton);
-        myCrimeReportsButton.setOnClickListener(v -> fetchUserCrimeReports());
-
+        Button viewHistoryButton = findViewById(R.id.viewHistoryButton);
         // Set up Report Crime Button functionality
         reportCrimeButton.setOnClickListener(v -> openReportCrimePage());
 
         // Set up SOS Button functionality
         emergencySOSButton.setOnClickListener(v -> checkAndSendSOS());
-
+        viewHistoryButton.setOnClickListener(v -> fetchUserCrimeReports());
         // Retrieve user information and update UI
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user != null) {
@@ -97,44 +98,59 @@ public class clientHome extends AppCompatActivity {
         });
     }
 
+
+
     private void openReportCrimePage() {
         Intent intent = new Intent(clientHome.this, reportCrimeActivity.class);
         startActivity(intent);
     }
 
     private void fetchUserCrimeReports() {
-        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
-        if (currentUser == null) {
-            Toast.makeText(this, "Please log in to view your reports.", Toast.LENGTH_SHORT).show();
+        // Get the logged-in user's username
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        String username = currentUser != null ? currentUser.getDisplayName() : null;
+
+        if (username == null) {
+            Toast.makeText(this, "Unable to fetch username. Please log in again.", Toast.LENGTH_SHORT).show();
             return;
         }
+        Log.d("FIREBASE_DEBUG", "Querying database with username: " + username);
 
-        String userId = currentUser.getUid();
-        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("crime_reports");
+        // Firebase database reference
+        DatabaseReference reportsRef = FirebaseDatabase.getInstance().getReference("crime_reports")
+                .child(username); //
 
-        databaseReference.orderByChild("username").equalTo(userId).get().addOnCompleteListener(task -> {
-            if (task.isSuccessful() && task.getResult() != null) {
-                if (task.getResult().getChildrenCount() == 0) {
-                    Toast.makeText(this, "No active crime reports found.", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-
-                ArrayList<CrimeReport> crimeReports = new ArrayList<>();
-                for (DataSnapshot snapshot : task.getResult().getChildren()) {
-                    CrimeReport report = snapshot.getValue(CrimeReport.class);
-                    if (report != null) {
-                        crimeReports.add(report);
+        reportsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    // Data exists, proceed with handling
+                    ArrayList<CrimeReport> crimeReports = new ArrayList<>();
+                    for (DataSnapshot reportSnapshot : dataSnapshot.getChildren()) {
+                        CrimeReport report = reportSnapshot.getValue(CrimeReport.class);
+                        if (report != null) {
+                            crimeReports.add(report);
+                        }
                     }
+                    // Pass data to next activity
+                    Intent intent = new Intent(clientHome.this, UserReportsActivity.class);
+                    intent.putParcelableArrayListExtra("crimeReports", crimeReports);
+                    startActivity(intent);
+                } else {
+                    Log.d("FIREBASE_DEBUG", "No crime reports found for " + username);
+                    Toast.makeText(clientHome.this, "No crime reports found for this user.", Toast.LENGTH_SHORT).show();
                 }
+            }
 
-                // Open a new activity or dialog to display the reports
-                Intent intent = new Intent(this, UserReportsActivity.class);
-                intent.putParcelableArrayListExtra("crimeReports", crimeReports);
-                startActivity(intent);
-            } else {
-                Toast.makeText(this, "Failed to fetch reports. Please try again.", Toast.LENGTH_SHORT).show();
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                // Log the error details
+                Log.e("FIREBASE_ERROR", "Error: " + databaseError.getMessage());
+                Toast.makeText(clientHome.this, "Failed to fetch reports. Please try again later.", Toast.LENGTH_SHORT).show();
             }
         });
+
     }
 
 
@@ -295,5 +311,14 @@ public class clientHome extends AppCompatActivity {
                 }
             }
         }
+    }
+    public void onCancelled(DatabaseError databaseError) {
+        // Log the full error details
+        Log.e("UserReportsActivity", "Error Code: " + databaseError.getCode());
+        Log.e("UserReportsActivity", "Error Message: " + databaseError.getMessage());
+        Log.e("UserReportsActivity", "Error Details: " + databaseError.getDetails());
+
+        // Display a Toast with the error message
+        Toast.makeText(clientHome.this, "Error fetching reports: " + databaseError.getMessage(), Toast.LENGTH_SHORT).show();
     }
 }

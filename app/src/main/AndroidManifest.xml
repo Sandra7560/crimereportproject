@@ -33,11 +33,12 @@
         android:theme="@style/Theme.Crime"
         tools:targetApi="31">
         <activity
-            android:name=".CrimeReportAdapter"
-            android:exported="false" />
-        <activity
             android:name=".UserReportsActivity"
             android:exported="false" />
+        <activity
+            android:name=".CrimeReportsAdapter"
+            android:exported="false"
+            tools:ignore="Instantiatable" />
         <activity
             android:name=".reportMissingPersonActivity"
             android:exported="false" />
@@ -51,7 +52,7 @@
             android:name=".reportCrimeActivity"
             android:exported="false" />
         <activity
-            android:name=".ViewReportsActivity"
+            android:name=".ViewReportActivity"
             android:exported="false" />
         <activity
             android:name=".PostCrimeNews"

@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">Crime</string>
+    <string-array name="status_options">
+        <item>Pending</item>
+        <item>Under Investigation</item>
+        <item>Resolved</item>
+    </string-array>
+
 </resources>

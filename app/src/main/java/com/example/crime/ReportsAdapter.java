@@ -4,57 +4,65 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.TextView;
-import java.util.ArrayList;
 
-public class ReportsAdapter extends BaseAdapter {
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
+
+import java.util.List;
+
+public class ReportsAdapter extends RecyclerView.Adapter<ReportsAdapter.ReportViewHolder> {
 
     private Context context;
-    private ArrayList<CrimeReport> crimeReports;
+    private List<CrimeReport> reports;
+    private OnReportClickListener listener;
 
-    public ReportsAdapter(Context context, ArrayList<CrimeReport> crimeReports) {
+    public ReportsAdapter(Context context, List<CrimeReport> reports, OnReportClickListener listener) {
         this.context = context;
-        this.crimeReports = crimeReports;
+        this.reports = reports;
+        this.listener = listener;
+    }
+
+
+    @NonNull
+    @Override
+    public ReportViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.report_item, parent, false);
+        return new ReportViewHolder(view);
     }
 
     @Override
-    public int getCount() {
-        return crimeReports.size();
+    public void onBindViewHolder(@NonNull ReportViewHolder holder, int position) {
+        CrimeReport report = reports.get(position);
+
+        holder.tvCrimeType.setText(report.getCrimeType());
+        holder.tvDescription.setText(report.getDescription());
+        holder.tvRemarks.setText(report.getRemarks());
+
+        holder.itemView.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onReportClick(report);
+            }
+        });
     }
 
     @Override
-    public Object getItem(int position) {
-        return crimeReports.get(position);
+    public int getItemCount() {
+        return reports != null ? reports.size() : 0;
     }
 
-    @Override
-    public long getItemId(int position) {
-        return position;
-    }
+    public static class ReportViewHolder extends RecyclerView.ViewHolder {
+        TextView tvCrimeType, tvDescription, tvRemarks;
 
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        if (convertView == null) {
-            LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            convertView = inflater.inflate(R.layout.report_item, null);
+        public ReportViewHolder(@NonNull View itemView) {
+            super(itemView);
+            tvCrimeType = itemView.findViewById(R.id.crimeTypeTextView);
+            tvDescription = itemView.findViewById(R.id.descriptionTextView);
+            tvRemarks = itemView.findViewById(R.id.remarksTextView);
         }
+    }
 
-        CrimeReport report = crimeReports.get(position);
-
-        // Get references to the views in report_item.xml
-        TextView crimeTypeTextView = convertView.findViewById(R.id.crimeTypeTextView);
-        TextView descriptionTextView = convertView.findViewById(R.id.descriptionTextView);
-        TextView usernameTextView = convertView.findViewById(R.id.usernameTextView);
-        TextView statusTextView = convertView.findViewById(R.id.crimeStatusTextView);  // Add status TextView
-  // Add status TextView
-
-        // Populate the views with data
-        crimeTypeTextView.setText(report.getCrimeType());
-        descriptionTextView.setText("Description: " + report.getDescription());
-        usernameTextView.setText("Reported by: " + report.getUsername());
-        statusTextView.setText("Status: " + report.getStatus());  // Display status
-
-        return convertView;
+    public interface OnReportClickListener {
+        void onReportClick(CrimeReport report);
     }
 }

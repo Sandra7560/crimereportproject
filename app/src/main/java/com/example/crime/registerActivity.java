@@ -6,12 +6,10 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 import com.google.firebase.auth.FirebaseAuth;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class registerActivity extends AppCompatActivity {
 
@@ -32,8 +30,14 @@ public class registerActivity extends AppCompatActivity {
             String email = emailField.getText().toString().trim();
             String password = passwordField.getText().toString().trim();
 
+            // Validate email format
             if (email.isEmpty() || password.isEmpty()) {
                 Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            if (!isValidEmail(email)) {
+                Toast.makeText(this, "Please enter a valid email", Toast.LENGTH_SHORT).show();
                 return;
             }
 
@@ -48,5 +52,13 @@ public class registerActivity extends AppCompatActivity {
                         }
                     });
         });
+    }
+
+    // Function to validate email format using regular expression
+    private boolean isValidEmail(String email) {
+        String emailPattern = "[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}";
+        Pattern pattern = Pattern.compile(emailPattern);
+        Matcher matcher = pattern.matcher(email);
+        return matcher.matches();
     }
 }
