@@ -9,6 +9,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.text.BreakIterator;
 import java.util.List;
 
 public class ReportsAdapter extends RecyclerView.Adapter<ReportsAdapter.ReportViewHolder> {
@@ -38,7 +39,7 @@ public class ReportsAdapter extends RecyclerView.Adapter<ReportsAdapter.ReportVi
         holder.tvCrimeType.setText(report.getCrimeType());
         holder.tvDescription.setText(report.getDescription());
         holder.tvRemarks.setText(report.getRemarks());
-
+       // holder.tvLocation.setText("Location: " + report.getLatitude() + ", " + report.getLongitude());
         holder.itemView.setOnClickListener(v -> {
             if (listener != null) {
                 listener.onReportClick(report);
@@ -52,6 +53,7 @@ public class ReportsAdapter extends RecyclerView.Adapter<ReportsAdapter.ReportVi
     }
 
     public static class ReportViewHolder extends RecyclerView.ViewHolder {
+        TextView tvLocation;
         TextView tvCrimeType, tvDescription, tvRemarks;
 
         public ReportViewHolder(@NonNull View itemView) {
@@ -59,6 +61,7 @@ public class ReportsAdapter extends RecyclerView.Adapter<ReportsAdapter.ReportVi
             tvCrimeType = itemView.findViewById(R.id.crimeTypeTextView);
             tvDescription = itemView.findViewById(R.id.descriptionTextView);
             tvRemarks = itemView.findViewById(R.id.remarksTextView);
+            //tvLocation = itemView.findViewById(R.id.locationTextView);
         }
     }
 

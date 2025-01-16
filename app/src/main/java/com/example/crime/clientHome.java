@@ -29,6 +29,7 @@ import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.Priority;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -50,7 +51,11 @@ public class clientHome extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_client_home);
-
+        Button btnReadNews = findViewById(R.id.btnReadNews);
+        btnReadNews.setOnClickListener(v -> {
+            Intent intent = new Intent(clientHome.this, NewsActivity.class);
+            startActivity(intent);
+        });
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
         TextView welcomeTextView = findViewById(R.id.welcomeTextView);
@@ -156,12 +161,10 @@ public class clientHome extends AppCompatActivity {
 
 
     private void checkAndSendSOS() {
-        // Check permissions
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 || ActivityCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED
                 || ActivityCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
 
-            // Request permissions
             ActivityCompat.requestPermissions(this, new String[]{
                     Manifest.permission.ACCESS_FINE_LOCATION,
                     Manifest.permission.SEND_SMS,
@@ -170,31 +173,22 @@ public class clientHome extends AppCompatActivity {
             return;
         }
 
-        // Request high-accuracy location
-        LocationRequest locationRequest = LocationRequest.create();
-        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        locationRequest.setInterval(10000);  // Update interval (10 seconds)
-        locationRequest.setFastestInterval(5000);  // Fastest interval (5 seconds)
-
-        locationCallback = new LocationCallback() {
-            @Override
-            public void onLocationResult(LocationResult locationResult) {
-                if (locationResult != null && locationResult.getLocations().size() > 0) {
-                    Location location = locationResult.getLastLocation();
+        // Request location using FusedLocationProvider
+        fusedLocationClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, null)
+                .addOnSuccessListener(location -> {
                     if (location != null) {
                         fetchEmergencyContactAndSendSOS(location);
-                        // Stop location updates after getting the location
-                        fusedLocationClient.removeLocationUpdates(locationCallback);
+                    } else {
+                        Toast.makeText(this, "Unable to fetch location. Please try again.", Toast.LENGTH_SHORT).show();
                     }
-                }
-            }
-        };
-
-        fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper());
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("SOS_DEBUG", "Error fetching location: " + e.getMessage());
+                    Toast.makeText(this, "Failed to get location.", Toast.LENGTH_SHORT).show();
+                });
     }
 
     private void fetchEmergencyContactAndSendSOS(Location location) {
-        // Fetch emergency contact details from the database
         userDatabaseReference.get().addOnCompleteListener(task -> {
             if (task.isSuccessful() && task.getResult() != null) {
                 String emergencyContact = task.getResult().child("emergencyContact").getValue(String.class);
@@ -205,25 +199,18 @@ public class clientHome extends AppCompatActivity {
                             "https://www.google.com/maps?q=" + location.getLatitude() + "," + location.getLongitude();
                     sendSOSAlert(location, emergencyMessage, emergencyContact, emergencyEmail);
                 } else {
-                    Toast.makeText(clientHome.this, "Emergency contact details not set.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Emergency contact details not set.", Toast.LENGTH_SHORT).show();
                 }
             } else {
-                Toast.makeText(clientHome.this, "Error fetching emergency contact details.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Error fetching emergency contact details.", Toast.LENGTH_SHORT).show();
             }
         });
     }
 
     private void sendSOSAlert(Location location, String emergencyMessage, String emergencyContact, String emergencyEmail) {
-        // Send SOS to Firebase
         sendSOSToFirebase(location, emergencyMessage, emergencyContact);
-
-        // Send SMS to emergency contact
         sendSMS(emergencyContact, emergencyMessage);
-
-        // Send Email alert
         sendEmailAlert(emergencyEmail, "Emergency SOS Alert", emergencyMessage);
-
-        // Make phone call to emergency contact
         makePhoneCall(emergencyContact);
     }
 
@@ -264,9 +251,7 @@ public class clientHome extends AppCompatActivity {
 
         if (alertId != null) {
             database.child("sos_alerts").child(alertId).setValue(sosAlert)
-                    .addOnSuccessListener(aVoid -> {
-                        Toast.makeText(this, "SOS alert sent successfully!", Toast.LENGTH_SHORT).show();
-                    })
+                    .addOnSuccessListener(aVoid -> Toast.makeText(this, "SOS alert sent successfully!", Toast.LENGTH_SHORT).show())
                     .addOnFailureListener(e -> {
                         Log.e("SOS_DEBUG", "Error saving SOS alert: " + e.getMessage());
                         Toast.makeText(this, "Failed to send SOS alert.", Toast.LENGTH_SHORT).show();
@@ -299,19 +284,18 @@ public class clientHome extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
-            if (grantResults.length > 0) {
-                boolean locationPermissionGranted = grantResults[0] == PackageManager.PERMISSION_GRANTED;
-                boolean smsPermissionGranted = grantResults[1] == PackageManager.PERMISSION_GRANTED;
-                boolean callPermissionGranted = grantResults[2] == PackageManager.PERMISSION_GRANTED;
+            boolean locationPermissionGranted = grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED;
+            boolean smsPermissionGranted = grantResults.length > 1 && grantResults[1] == PackageManager.PERMISSION_GRANTED;
+            boolean callPermissionGranted = grantResults.length > 2 && grantResults[2] == PackageManager.PERMISSION_GRANTED;
 
-                if (locationPermissionGranted && smsPermissionGranted && callPermissionGranted) {
-                    checkAndSendSOS();
-                } else {
-                    Toast.makeText(this, "Location, SMS, and Phone permissions are required for SOS functionality.", Toast.LENGTH_SHORT).show();
-                }
+            if (locationPermissionGranted && smsPermissionGranted && callPermissionGranted) {
+                checkAndSendSOS();
+            } else {
+                Toast.makeText(this, "Permissions are required for SOS functionality.", Toast.LENGTH_SHORT).show();
             }
         }
     }
+
     public void onCancelled(DatabaseError databaseError) {
         // Log the full error details
         Log.e("UserReportsActivity", "Error Code: " + databaseError.getCode());

@@ -11,12 +11,21 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
-public class ViewReportActivity extends AppCompatActivity {
+public class ViewReportActivity extends AppCompatActivity implements  OnMapReadyCallback{
 
     private RecyclerView recyclerView;
     private ReportsAdapter reportAdapter;
@@ -24,8 +33,8 @@ public class ViewReportActivity extends AppCompatActivity {
     private Button btnUpdateRemarks;
     private CrimeReport selectedReport;
 
-
-
+    private GoogleMap googleMap;
+    private GoogleMap mMap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,17 +46,22 @@ public class ViewReportActivity extends AppCompatActivity {
         btnUpdateRemarks = findViewById(R.id.btnUpdateRemarks);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+        if (mapFragment != null) {
+            mapFragment.getMapAsync((OnMapReadyCallback) this);
+        }
         // Fetch data passed from the previous activity
         ArrayList<CrimeReport> reports = getIntent().getParcelableArrayListExtra("reports");
 
         if (reports != null && !reports.isEmpty()) {
             Log.d("ViewReportActivity", "Received " + reports.size() + " reports.");
-
-            reportAdapter = new ReportsAdapter(this, reports, this::onReportSelected); // Pass listener
+            reportAdapter = new ReportsAdapter(this, reports, this::onReportSelected);
             recyclerView.setAdapter(reportAdapter);
         } else {
             Log.e("ViewReportActivity", "No reports received or list is empty.");
+            Toast.makeText(this, "No crime reports available.", Toast.LENGTH_SHORT).show();
+            reportAdapter = new ReportsAdapter(this, new ArrayList<>(), this::onReportSelected); // Set empty list
+            recyclerView.setAdapter(reportAdapter);
         }
 
         btnUpdateRemarks.setOnClickListener(v -> {
@@ -62,28 +76,67 @@ public class ViewReportActivity extends AppCompatActivity {
 
     private void onReportSelected(CrimeReport report) {
         selectedReport = report;
-        etRemarks.setText(report.getRemarks()); // Pre-fill existing remarks
+        etRemarks.setText(report.getRemarks());
+        if (googleMap != null && report.getLatitude() != null && report.getLongitude() != null) {
+            LatLng location = new LatLng(report.getLatitude(), report.getLongitude());
+
+            googleMap.clear(); // Clear previous markers
+            googleMap.addMarker(new MarkerOptions().position(location).title(report.getCrimeType()));
+            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 14));
+        }
+// Pre-fill existing remarks
         Toast.makeText(this, "Selected: " + report.getCrimeType(), Toast.LENGTH_SHORT).show();
     }
 
 
     private void updateRemarks(CrimeReport report, String remarks) {
-        // Assuming 'reportId' is a unique ID for each report in your database
-        DatabaseReference reportRef = FirebaseDatabase.getInstance()
+        DatabaseReference reportsRef = FirebaseDatabase.getInstance()
                 .getReference("crime_reports")
-                .child(report.getUsername()).child(report.getCrimeType());  // Replace with unique user reference if applicable
-                 // Adjust this key for the unique report
+                .child(report.getUsername());
 
-        // Update remarks in the database
-        reportRef.child("remarks").setValue(remarks).addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                Toast.makeText(this, "Remarks updated successfully.", Toast.LENGTH_SHORT).show();
-                report.setRemarks(remarks);  // Update remarks locally
-                reportAdapter.notifyDataSetChanged(); // Refresh the report list to show updated remarks
-            } else {
-                Toast.makeText(this, "Failed to update remarks.", Toast.LENGTH_SHORT).show();
+        reportsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                boolean reportFound = false;
+
+                for (DataSnapshot reportSnapshot : dataSnapshot.getChildren()) {
+                    CrimeReport fetchedReport = reportSnapshot.getValue(CrimeReport.class);
+
+                    if (fetchedReport != null && fetchedReport.getCrimeType().equals(report.getCrimeType())
+                            && fetchedReport.getDescription().equals(report.getDescription())) {
+
+                        // Update the remarks for the matched report
+                        reportSnapshot.getRef().child("remarks").setValue(remarks).addOnCompleteListener(task -> {
+                            if (task.isSuccessful()) {
+                                Toast.makeText(ViewReportActivity.this, "Remarks updated successfully.", Toast.LENGTH_SHORT).show();
+                            } else {
+                                Toast.makeText(ViewReportActivity.this, "Failed to update remarks.", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                        reportFound = true;
+                        break;
+                    }
+                }
+
+                if (!reportFound) {
+                    Toast.makeText(ViewReportActivity.this, "Report not found.", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.e("FIREBASE_DEBUG", "Database error: " + databaseError.getMessage());
+                Toast.makeText(ViewReportActivity.this, "Error accessing database.", Toast.LENGTH_SHORT).show();
             }
         });
     }
 
+
+    public void onMapReady(GoogleMap googleMap) {
+        LatLng location = new LatLng(45.37229823816096, -73.66356108337641);
+        googleMap.addMarker(new MarkerOptions().position(location).title("Crime Location"));
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 15));
+    }
+
 }
+

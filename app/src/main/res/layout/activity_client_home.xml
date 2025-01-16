@@ -81,7 +81,16 @@
         android:layout_marginTop="16dp"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp" />
+    <Button
+        android:id="@+id/btnReadNews"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:text="Read News"
 
+        android:textColor="@android:color/white"
+        android:padding="12dp" />
     <!-- Emergency SOS Button -->
     <Button
         android:id="@+id/emergencySOSButton"

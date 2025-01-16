@@ -5,6 +5,8 @@ import android.os.Parcelable;
 
 import androidx.annotation.NonNull;
 
+import com.google.firebase.database.Exclude;
+
 public class CrimeReport implements Parcelable {
 
     private String crimeType;
@@ -13,6 +15,8 @@ public class CrimeReport implements Parcelable {
     private String username;
     private Double latitude;  // Keep as Double
     private Double longitude; // Keep as Double
+    @Exclude
+    private String reportId; // Exclude unmapped fields
 
     // Default constructor
     public CrimeReport() {}

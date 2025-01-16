@@ -45,13 +45,16 @@ public class AdminHome extends AppCompatActivity {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
                     ArrayList<CrimeReport> allCrimeReports = new ArrayList<>();
-                    for (DataSnapshot userSnapshot : dataSnapshot.getChildren()) {
-                        String username = userSnapshot.getKey(); // Get the username
-                        for (DataSnapshot reportSnapshot : userSnapshot.getChildren()) {
+                    for (DataSnapshot userSnapshot : dataSnapshot.getChildren()) { // Loop through each user node
+                        for (DataSnapshot reportSnapshot : userSnapshot.getChildren()) { // Loop through each report node
                             CrimeReport report = reportSnapshot.getValue(CrimeReport.class);
                             if (report != null) {
-                                report.setUsername(username); // Set the username
-                                report.setCrimeType(reportSnapshot.getKey()); // Set the crimeType as the identifier
+                                // Retrieve the key as reportId
+                                String reportId = reportSnapshot.getKey();
+                                Log.d("REPORT_ID", "Fetched reportId: " + reportId);
+
+                                // Optionally attach the reportId to the remarks field for easier debugging
+                                report.setRemarks("Report ID: " + reportId);
                                 allCrimeReports.add(report);
                             }
                         }
@@ -59,7 +62,7 @@ public class AdminHome extends AppCompatActivity {
 
                     // Pass data to ViewReportActivity
                     Intent intent = new Intent(AdminHome.this, ViewReportActivity.class);
-                    intent.putParcelableArrayListExtra("crimeReports", allCrimeReports);
+                    intent.putParcelableArrayListExtra("reports", allCrimeReports);
                     startActivity(intent);
                 } else {
                     Log.d("FIREBASE_DEBUG", "No crime reports found.");
@@ -76,10 +79,17 @@ public class AdminHome extends AppCompatActivity {
     }
 
     private void handleLogout() {
-        // Add logout logic here
+        // Add logout logic here (e.g., clearing user data, Firebase auth sign out)
         Toast.makeText(this, "Logged out successfully", Toast.LENGTH_SHORT).show();
-        finish();
+
+        // Redirect to SignInActivity
+        Intent intent = new Intent(this, signinActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK); // Clear activity stack
+        startActivity(intent);
+
+        finish(); // Close the current activity
     }
+
 
     private void handlePostCrimeNews() {
         // Navigate to the PostCrimeNews activity
